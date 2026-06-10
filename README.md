@@ -374,12 +374,12 @@ sudo systemctl disable bp-estimator
 
 
 
-**Ritam Pal** —  **B.Sc(H)** **Physics**, University of Calcutta (2022) \&
+**1. Ritam Pal** —  **B.Sc(H)** **Physics**, University of Calcutta (2022) \&
 
 &#x20;            **B.Tech(ECE)**, Institute of Radiophysics \& Electronics, University of Calcutta (2026)
 
 &#x20;
-**Swapnil Saha** —  **B.Sc(H)** **Physics**, University of Calcutta (2023) \&
+**2. Swapnil Saha** —  **B.Sc(H)** **Physics**, University of Calcutta (2023) \&
 
 &#x20;            **B.Tech(ECE)**, Institute of Radiophysics \& Electronics, University of Calcutta (2026)
 
