@@ -107,12 +107,12 @@ The ML approach uses a **Variational Autoencoder (VAE)** to extract latent featu
 
 
 
-\---bash
+---bash
 pip install tensorflow scikit-learn numpy pandas matplotlib \\
 pyserial joblib scipy RPLCD smbus2 \\
 --break-system-packages
 
-\---
+---
 
 
 
@@ -143,18 +143,18 @@ col 2     → timestamp
 col 3–103 → PPG waveform samples s1...s101
 ```
 
-\---
+---
 
-## Installation \& Setup
+## Installation & Setup
 
-### 1\. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/2002PAL/Blood_Pressure_Estimator.git
 cd bp-estimator
 ```
 
-### 2\. Install Python dependencies on Raspberry Pi
+### 2. Install Python dependencies on Raspberry Pi
 
 ```bash
 pip install tensorflow scikit-learn numpy pandas matplotlib \
@@ -162,7 +162,7 @@ pip install tensorflow scikit-learn numpy pandas matplotlib \
             --break-system-packages
 ```
 
-### 3\. Enable I2C on Raspberry Pi (for LCD)
+### 3. Enable I2C on Raspberry Pi (for LCD)
 
 ```bash
 sudo raspi-config
@@ -182,7 +182,7 @@ If your LCD shows address `0x3F`, update `LCD_I2C_ADDRESS` in `bp_main.py`:
 LCD_I2C_ADDRESS = 0x3F
 ```
 
-### 4\. Flash ESP32 firmware
+### 4. Flash ESP32 firmware
 
 Open `ppg.ino` in Arduino IDE and flash to your ESP32. Ensure:
 
@@ -191,7 +191,7 @@ Open `ppg.ino` in Arduino IDE and flash to your ESP32. Ensure:
 #define SAMPLE_RATE  101   // Hz
 ```
 
-### 5\. Transfer files to Raspberry Pi (via SCP)
+### 5. Transfer files to Raspberry Pi (via SCP)
 
 ```bash
 scp bp_main.py <username_of_your_system>@<your_RPi_IP>:/home/<username>/bp_project/bp_main.py
@@ -204,8 +204,8 @@ scp bp_main.py <username_of_your_system>@<your_RPi_IP>:/home/<username>/bp_proje
 Run the main script:
 
 ```bash
-cd /home/ritam2002/bp\_project
-python3 bp\_main.py
+cd /home/ritam2002/bp_project
+python3 bp_main.py
 ```
 
 You will see:
@@ -255,13 +255,13 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 |4. Collect \& Save Data|Gathers new labelled PPG data and saves to CSV|
 |5. Exit|Shuts down cleanly|
 
-\---
+---
 
 ## ML Pipeline
 
 **-------------------------**
 
-### 1\. Signal Acquisition
+### 1. Signal Acquisition
 
 * ESP32 samples PPG at **101 Hz** using 12-bit ADC (0–4095)
 * Every 1-second window (101 samples) is sent over USB serial
@@ -269,14 +269,14 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 
 
 
-### 2\. Preprocessing
+### 2. Preprocessing
 
 * Per-sample z-score normalization:  
 `X_norm = (X - mean) / std`
 
 
 
-### 3\. Variational Autoencoder (VAE)
+### 3. Variational Autoencoder (VAE)
 
 * **Encoder**: `101 → Dense(128) → Dense(64) → z_mean, z_log_var (dim=8)`
 * **Decoder**: `8 → Dense(64) → Dense(128) → 101`
@@ -286,7 +286,7 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 
 
 
-### 4\. Random Forest Regressor
+### 4. Random Forest Regressor
 
 * Input: 8-dimensional latent vector `z_mean` from encoder
 * Output: `[SBP, DBP]` in mmHg
@@ -294,7 +294,7 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 
 
 
-### 5\. BP Classification
+### 5. BP Classification
 
 
 
@@ -305,7 +305,7 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 |High Stage 1|130–139|80–89|
 |High Stage 2|≥ 140|≥ 90|
 
-\---
+---
 
 ## Results
 
@@ -320,7 +320,7 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 
 > **Note:** Accuracy can be improved by collecting more subject-specific data using Option 4 and retraining with a larger, more diverse dataset.
 
-\---
+---
 
 ## Auto-Start on Boot
 
