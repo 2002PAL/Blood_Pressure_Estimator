@@ -150,15 +150,15 @@ col 3–103 → PPG waveform samples s1...s101
 ### 1\. Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/bp-estimator.git
+git clone https://github.com/2002PAL/Blood_Pressure_Estimator.git
 cd bp-estimator
 ```
 
 ### 2\. Install Python dependencies on Raspberry Pi
 
 ```bash
-pip install tensorflow scikit-learn numpy pandas matplotlib \\\\\\\\
-            pyserial joblib scipy RPLCD smbus2 \\\\\\\\
+pip install tensorflow scikit-learn numpy pandas matplotlib \
+            pyserial joblib scipy RPLCD smbus2 \
             --break-system-packages
 ```
 
@@ -176,25 +176,25 @@ sudo i2cdetect -y 1
 # Should show 0x27 or 0x3F
 ```
 
-If your LCD shows address `0x3F`, update `LCD\\\\\\\_I2C\\\\\\\_ADDRESS` in `bp\\\\\\\_main.py`:
+If your LCD shows address `0x3F`, update `LCD_I2C_ADDRESS` in `bp_main.py`:
 
 ```python
-LCD\\\\\\\_I2C\\\\\\\_ADDRESS = 0x3F
+LCD_I2C_ADDRESS = 0x3F
 ```
 
 ### 4\. Flash ESP32 firmware
 
-Open `esp32\\\\\\\_ppg.ino` in Arduino IDE and flash to your ESP32. Ensure:
+Open `ppg.ino` in Arduino IDE and flash to your ESP32. Ensure:
 
 ```cpp
-#define NUM\\\\\\\_SAMPLES  101   // must match training data waveform columns
-#define SAMPLE\\\\\\\_RATE  101   // Hz
+#define NUM_SAMPLES  101   // must match training data waveform columns
+#define SAMPLE_RATE  101   // Hz
 ```
 
 ### 5\. Transfer files to Raspberry Pi (via SCP)
 
 ```bash
-scp bp\\\\\\\_main.py <username\\\\\\\_of\\\\\\\_your\\\\\\\_system>@<your\\\\\\\_RPi\\\\\\\_IP>:/home/<username>/bp\\\\\\\_project/bp\\\\\\\_main.py
+scp bp_main.py <username_of_your_system>@<your_RPi_IP>:/home/<username>/bp_project/bp_main.py
 ```
 
 \---
@@ -204,8 +204,8 @@ scp bp\\\\\\\_main.py <username\\\\\\\_of\\\\\\\_your\\\\\\\_system>@<your\\\\\\
 Run the main script:
 
 ```bash
-cd /home/ritam2002/bp\\\\\\\_project
-python3 bp\\\\\\\_main.py
+cd /home/ritam2002/bp\_project
+python3 bp\_main.py
 ```
 
 You will see:
@@ -227,7 +227,7 @@ You will see:
 
 
 
-1. Choose **Option 1** → select `train\\\\\\\_data\\\\\\\_cleaned.csv`
+1. Choose **Option 1** → select `train_data_cleaned.csv`
 2. Training takes \~5 minutes (VAE: 20 epochs + Random Forest: 200 trees)
 3. Model is **automatically saved to disk** — you never need to retrain again
 
@@ -265,20 +265,20 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 
 * ESP32 samples PPG at **101 Hz** using 12-bit ADC (0–4095)
 * Every 1-second window (101 samples) is sent over USB serial
-* Packet format: `START:v1,v2,...,v101:END\\\\\\\\n`
+* Packet format: `START:v1,v2,...,v101:END\n`
 
 
 
 ### 2\. Preprocessing
 
 * Per-sample z-score normalization:  
-`X\\\\\\\_norm = (X - mean) / std`
+`X_norm = (X - mean) / std`
 
 
 
 ### 3\. Variational Autoencoder (VAE)
 
-* **Encoder**: `101 → Dense(128) → Dense(64) → z\\\\\\\_mean, z\\\\\\\_log\\\\\\\_var (dim=8)`
+* **Encoder**: `101 → Dense(128) → Dense(64) → z_mean, z_log_var (dim=8)`
 * **Decoder**: `8 → Dense(64) → Dense(128) → 101`
 * **Loss**: Reconstruction loss + KL divergence
 * **Epochs**: 20, Batch size: 64, Optimizer: Adam (lr=1e-3)
@@ -288,8 +288,8 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 
 ### 4\. Random Forest Regressor
 
-* Input: 8-dimensional latent vector `z\\\\\\\_mean` from encoder
-* Output: `\\\\\\\[SBP, DBP]` in mmHg
+* Input: 8-dimensional latent vector `z_mean` from encoder
+* Output: `[SBP, DBP]` in mmHg
 * 200 trees, max depth 10
 
 
@@ -318,7 +318,7 @@ The saved model loads automatically at startup. Just choose **Option 3**.
 |SBP SD|16.13 mmHg|
 |DBP SD|8.01 mmHg|
 
-> \\\\\\\*\\\\\\\*Note:\\\\\\\*\\\\\\\* Accuracy can be improved by collecting more subject-specific data using Option 4 and retraining with a larger, more diverse dataset.
+> **Note:** Accuracy can be improved by collecting more subject-specific data using Option 4 and retraining with a larger, more diverse dataset.
 
 \---
 
@@ -359,11 +359,11 @@ sudo systemctl disable bp-estimator
 
 |Problem|Likely Cause|Fix|
 |-|-|-|
-|`LCD init failed`|Wrong I2C address|Run `sudo i2cdetect -y 1`, update `LCD\\\\\\\_I2C\\\\\\\_ADDRESS` in config|
-|`No ESP32 port found`|USB not detected|Check USB cable, run `ls /dev/ttyUSB\\\\\\\* /dev/ttyACM\\\\\\\*`|
-|`ESP32\\\\\\\_READY not received`|ESP32 boot time varies|Harmless — system proceeds anyway after 15s|
-|`Matrix size incompatible`|NUM\_SAMPLES mismatch|Set `#define NUM\\\\\\\_SAMPLES 101` in ESP32 code|
-|`Encoder save FAILED`|Old TF/Keras version|Ensure `ENCODER\\\\\\\_SAVE\\\\\\\_PATH` ends in `.keras`|
+|`LCD init failed`|Wrong I2C address|Run `sudo i2cdetect -y 1`, update `LCD_I2C_ADDRESS` in config|
+|`No ESP32 port found`|USB not detected|Check USB cable, run `ls /dev/ttyUSB* /dev/ttyACM*`|
+|`ESP32_READY not received`|ESP32 boot time varies|Harmless — system proceeds anyway after 15s|
+|`Matrix size incompatible`|NUM\_SAMPLES mismatch|Set `#define NUM_SAMPLES 101` in ESP32 code|
+|`Encoder save FAILED`|Old TF/Keras version|Ensure `ENCODER_SAVE_PATH` ends in `.keras`|
 |`TabError`|Mixed tabs and spaces|Run `python3 -c "open('f').read().expandtabs(4)"` to fix|
 |Model not loading|Missing `.keras` or `.joblib` file|Retrain using Option 1|
 |High MAE|Limited training data|Collect more data with Option 4 and retrain|
